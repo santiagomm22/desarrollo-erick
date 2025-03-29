@@ -1,16 +1,6 @@
 // src/components/layouts/Sidebar.tsx
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import {
-  Home,
-  Users,
-  Truck,
-  Building2,
-  FileText,
-  Database,
-  BarChart,
-  Settings,
-  LogOut,
-} from "lucide-react";
+import { Home, Users, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "../ui/ScrollArea";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,29 +13,13 @@ interface SidebarProps {
 }
 
 const navItems = [
-  { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Solicitudes", href: "/solicitudes", icon: FileText },
-  { name: "Empresas", href: "/empresas", icon: Building2 },
-  { name: "Conductores", href: "/conductores", icon: Users },
-  { name: "Vehículos", href: "/vehiculos", icon: Truck },
-  {
-    name: "Catálogos",
-    href: "/catalogos",
-    icon: Database,
-    submenu: [
-      { name: "EPS", href: "/catalogos/eps" },
-      { name: "ARL", href: "/catalogos/arl" },
-      { name: "Tipos de Vertimiento", href: "/catalogos/tipos-vertimiento" },
-      { name: "Causales", href: "/catalogos/causales" },
-    ],
-  },
-  { name: "Reportes", href: "/reportes", icon: BarChart },
   {
     name: "Usuarios",
     href: "/usuarios",
-    icon: Settings,
+    icon: Users,
     roles: ["ADMINISTRADOR"],
   },
+  { name: "Dashboard", href: "/dashboard", icon: Home },
 ];
 
 export function Sidebar({ onClose }: SidebarProps) {
@@ -58,7 +32,7 @@ export function Sidebar({ onClose }: SidebarProps) {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/login");
+    navigate("/");
     if (onClose) onClose();
   };
 
@@ -96,32 +70,6 @@ export function Sidebar({ onClose }: SidebarProps) {
               <Icon className="h-4 w-4" />
               <span>{item.name}</span>
             </Link>
-
-            {item.submenu && (
-              <div className="ml-6 mt-1 grid gap-1">
-                {item.submenu.map((subItem, subIndex) => {
-                  const isSubActive = isActive(subItem.href);
-
-                  return (
-                    <Link
-                      key={subIndex}
-                      to={subItem.href}
-                      className={cn(
-                        "flex items-center gap-3 rounded-md px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-                        isSubActive
-                          ? "bg-accent/50 text-accent-foreground"
-                          : "transparent"
-                      )}
-                      onClick={() => {
-                        if (onClose) onClose();
-                      }}
-                    >
-                      <span>{subItem.name}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
           </div>
         );
       })}

@@ -16,14 +16,16 @@ const DashboardHeader = () => {
     <Card>
       <CardContent className="flex justify-between items-center p-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Creacion de Usuarios
+          </h1>
           <p className="text-muted-foreground flex items-center mt-1">
             <CalendarDays className="mr-1 h-4 w-4" />
             {formattedDate}
           </p>
         </div>
         <div className="flex gap-2">
-          <Button>Nueva Solicitud</Button>
+          <Button>Crear Usuario</Button>
         </div>
       </CardContent>
     </Card>

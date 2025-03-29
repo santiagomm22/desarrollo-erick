@@ -3,11 +3,25 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import axios from "axios";
 import { Notify } from "notiflix/build/notiflix-notify-aio";
 import { loginSuccess } from "../../store/slices/authSlice";
 import { useDispatch } from "react-redux";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../components/ui/Dialog";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -16,18 +30,18 @@ export function EmcaliIcon() {
     <img
       src="/images/LOGO-EMCALI.png"
       alt="Emcali Icon"
-      className="h-[100px] w-[273px] mx-auto block"
+      className="h-20 w-auto mx-auto"
     />
   );
 }
 
-interface SignInCardProps extends React.ComponentProps<typeof Card> {}
-
-export default function SignInCard({ className, ...props }: SignInCardProps) {
+export default function SignInCard() {
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [resetEmail, setResetEmail] = React.useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -48,20 +62,23 @@ export default function SignInCard({ className, ...props }: SignInCardProps) {
 
     if (!password.value || password.value.length < 6) {
       setPasswordError(true);
-      setPasswordErrorMessage("La password debe tener al menos 6 caracteres.");
+      setPasswordErrorMessage(
+        "La contraseña debe tener al menos 6 caracteres."
+      );
       isValid = false;
     } else {
       setPasswordError(false);
       setPasswordErrorMessage("");
     }
-    console.log("Validación completada:", isValid);
     return isValid;
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsSubmitting(true);
 
     if (!validateInputs()) {
+      setIsSubmitting(false);
       return;
     }
 
@@ -92,17 +109,11 @@ export default function SignInCard({ className, ...props }: SignInCardProps) {
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("rol", user.role);
 
-      console.log("Contenido de localStorage (user):", user);
-
       const targetRoute = (() => {
         switch (user.rol) {
           case "ADMINISTRADOR":
             return "/dashboard";
-          case "OPERARIO":
-            return "/ConfirmarDescarga";
-          case "VIGILANCIA":
-            return "/ConfirmarIngreso";
-          case "COORDINADOR":
+          case "USUARIO":
             return "/RgVactor";
           default:
             Notify.warning(
@@ -121,54 +132,119 @@ export default function SignInCard({ className, ...props }: SignInCardProps) {
         "Ocurrió un error inesperado. Por favor, intente nuevamente.";
 
       Notify.failure(errorMessage);
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!resetEmail || !/\S+@\S+\.\S+/.test(resetEmail)) {
+      Notify.failure("Por favor, ingrese un correo electrónico válido");
+      return;
+    }
+
+    try {
+      // Aquí implementarías la lógica para solicitar restablecer contraseña
+      // await axios.post(`${baseUrl}/auth/reset-password`, { email: resetEmail });
+      Notify.success("Se ha enviado un correo para restablecer su contraseña");
+      setResetEmail("");
+    } catch (error) {
+      Notify.failure("No se pudo procesar su solicitud. Intente nuevamente.");
     }
   };
 
   return (
-    <Card
-      className={`flex flex-col self-center w-full p-6 gap-4 sm:w-[450px] 
-      shadow-[hsla(220,30%,5%,0.05)_0px_5px_15px_0px,hsla(220,25%,10%,0.05)_0px_15px_35px_-5px]
-      dark:shadow-[hsla(220,30%,5%,0.5)_0px_5px_15px_0px,hsla(220,25%,10%,0.08)_0px_15px_35px_-5px]
-      ${className || ""}`}
-      {...props}
+    <div
+      className="flex min-h-screen items-center justify-center bg-cover bg-center bg-no-repeat px-4 py-12"
+      style={{
+        backgroundImage: "url('/images/FondoEmcali.png')",
+        backgroundSize: "cover",
+        backgroundColor: "rgba(0, 0, 0, 0.6)", // Fallback color
+        backgroundBlendMode: "overlay", // Oscurece ligeramente la imagen
+      }}
     >
-      <EmcaliIcon />
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="space-y-4 text-center">
+          <EmcaliIcon />
+          <h1 className="text-3xl font-bold">Iniciar Sesión</h1>
+        </CardHeader>
 
-      <h1 className="w-full text-center text-[clamp(2rem,10vw,2.15rem)] font-bold">
-        Iniciar Sesión
-      </h1>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="correo">Correo Electrónico</Label>
+              <Input
+                id="correo"
+                type="email"
+                placeholder="usuario@correo.com"
+                className={emailError ? "border-red-500" : ""}
+              />
+              {emailError && (
+                <p className="text-sm text-red-500">{emailErrorMessage}</p>
+              )}
+            </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col w-full gap-4">
-        <div className="grid gap-2">
-          <Label htmlFor="correo">Correo</Label>
-          <Input
-            id="correo"
-            type="email"
-            placeholder="usuario@correo.com"
-            className={emailError ? "border-red-500" : ""}
-          />
-          {emailError && (
-            <p className="text-sm text-red-500">{emailErrorMessage}</p>
-          )}
-        </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Contraseña</Label>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="link" className="p-0 h-auto text-sm">
+                      ¿Olvidó su contraseña?
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Recuperar Contraseña</DialogTitle>
+                      <DialogDescription>
+                        Ingrese su correo electrónico y le enviaremos
+                        instrucciones para recuperar su contraseña.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="reset-email">Correo Electrónico</Label>
+                        <Input
+                          id="reset-email"
+                          type="email"
+                          placeholder="usuario@correo.com"
+                          value={resetEmail}
+                          onChange={(e) => setResetEmail(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type="button" onClick={handleResetPassword}>
+                        Enviar Instrucciones
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••"
+                className={passwordError ? "border-red-500" : ""}
+              />
+              {passwordError && (
+                <p className="text-sm text-red-500">{passwordErrorMessage}</p>
+              )}
+            </div>
 
-        <div className="grid gap-2">
-          <Label htmlFor="password">Contraseña</Label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="••••••"
-            className={passwordError ? "border-red-500" : ""}
-          />
-          {passwordError && (
-            <p className="text-sm text-red-500">{passwordErrorMessage}</p>
-          )}
-        </div>
+            <Button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Iniciando sesión..." : "Ingresar"}
+            </Button>
+          </form>
+        </CardContent>
 
-        <Button type="submit" className="w-full bg-gray-800 hover:bg-gray-700">
-          Ingresar
-        </Button>
-      </form>
-    </Card>
+        <CardFooter className="text-center text-sm text-gray-500">
+          Sistema de Gestión - EMCALI
+        </CardFooter>
+      </Card>
+    </div>
   );
 }
