@@ -2,6 +2,7 @@
 import { Routes, Route } from "react-router-dom";
 import SignInCard from "@/pages/login/SignInCard";
 import DashboardUsuarios from "@/pages/CrearUsuarios/DashboardUsuarios";
+import RegistroForm from "@/pages/registro/RegistroForm";
 import ProtectedRoute from "./ProtectedRoute";
 import MainLayout from "@/components/layouts/MainLayout";
 
@@ -10,6 +11,7 @@ const Routers = () => {
     <Routes>
       {/* Rutas públicas */}
       <Route path="/" element={<SignInCard />} />
+      <Route path="/registro" element={<RegistroForm />} />
       <Route element={<MainLayout />}>
         <Route path="/usuarios" element={<DashboardUsuarios />} />
 

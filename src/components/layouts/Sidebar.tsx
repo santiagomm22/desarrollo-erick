@@ -1,6 +1,6 @@
 // src/components/layouts/Sidebar.tsx
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Users, LogOut } from "lucide-react";
+import { Users, LogOut, ArchiveRestore } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "../ui/ScrollArea";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,7 +19,7 @@ const navItems = [
     icon: Users,
     roles: ["ADMINISTRADOR"],
   },
-  { name: "Dashboard", href: "/dashboard", icon: Home },
+  { name: "Cargar Archivos", href: "/archivos", icon: ArchiveRestore },
 ];
 
 export function Sidebar({ onClose }: SidebarProps) {
