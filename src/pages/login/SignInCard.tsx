@@ -47,7 +47,13 @@ export default function SignInCard() {
 
   const validateInputs = () => {
     const correo = document.getElementById("correo") as HTMLInputElement;
+<<<<<<< HEAD
     const contraseña = document.getElementById("contraseña") as HTMLInputElement; // Cambiamos el ID aquí
+=======
+    const contraseña = document.getElementById(
+      "contraseña"
+    ) as HTMLInputElement; // Cambiamos el ID aquí
+>>>>>>> b32469c2678bce0d3a6cee6d0fb4a686093d4a7f
 
     let isValid = true;
 
@@ -60,6 +66,7 @@ export default function SignInCard() {
       setEmailErrorMessage("");
     }
 
+<<<<<<< HEAD
     // if (!contraseña.value || contraseña.value.length < 6) {
     //   setPasswordError(true);
     //   setPasswordErrorMessage(
@@ -70,6 +77,18 @@ export default function SignInCard() {
     //   setPasswordError(false);
     //   setPasswordErrorMessage("");
     // }
+=======
+    if (!contraseña.value || contraseña.value.length < 6) {
+      setPasswordError(true);
+      setPasswordErrorMessage(
+        "La contraseña debe tener al menos 6 caracteres."
+      );
+      isValid = false;
+    } else {
+      setPasswordError(false);
+      setPasswordErrorMessage("");
+    }
+>>>>>>> b32469c2678bce0d3a6cee6d0fb4a686093d4a7f
     return isValid;
   };
 
@@ -85,7 +104,12 @@ export default function SignInCard() {
     const correo = (document.getElementById("correo") as HTMLInputElement).value;
     const data = {
       correo,
+<<<<<<< HEAD
       contraseña: (document.getElementById("contraseña") as HTMLInputElement).value, // Cambiamos "password" por "contraseña"
+=======
+      contraseña: (document.getElementById("contraseña") as HTMLInputElement)
+        .value, // Cambiamos "password" por "contraseña"
+>>>>>>> b32469c2678bce0d3a6cee6d0fb4a686093d4a7f
     };
 
     try {
@@ -186,7 +210,12 @@ export default function SignInCard() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
+<<<<<<< HEAD
                 <Label htmlFor="contraseña">Contraseña</Label> {/* Cambiamos el htmlFor */}
+=======
+                <Label htmlFor="contraseña">Contraseña</Label>{" "}
+                {/* Cambiamos el htmlFor */}
+>>>>>>> b32469c2678bce0d3a6cee6d0fb4a686093d4a7f
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="link" className="p-0 h-auto text-sm">
@@ -222,7 +251,11 @@ export default function SignInCard() {
                 </Dialog>
               </div>
               <Input
+<<<<<<< HEAD
                 id="contraseña" 
+=======
+                id="contraseña"
+>>>>>>> b32469c2678bce0d3a6cee6d0fb4a686093d4a7f
                 type="password"
                 placeholder="••••••"
                 className={passwordError ? "border-red-500" : ""}
