@@ -21,12 +21,18 @@ interface User {
   cedula: string;
   correo: string;
   numeroContrato: string;
-  duracionMeses: string;
-  fechaInicio: string;
-  fechaFinalizacion: string;
-  rol: string;
+  duracion_meses: string;
+  fecha_inicio: string;
+  fecha_finalizacion: string;
+  rol: Rol;
   direccion: string;
   comuna: string;
+}
+
+interface Rol {
+  id:string;
+  nombre:string;
+  descripcion: string;
 }
 
 interface TableUsuariosProps {
@@ -79,11 +85,11 @@ export const TableUsuarios = ({ users, loading }: TableUsuariosProps) => {
                       </TableCell>
                       <TableCell>{user.cedula}</TableCell>
                       <TableCell>{user.correo}</TableCell>
-                      <TableCell>{user.rol}</TableCell>
+                      <TableCell>{user.rol.nombre}</TableCell>
                       <TableCell>{user.numeroContrato}</TableCell>
-                      <TableCell>{user.duracionMeses} meses</TableCell>
-                      <TableCell>{user.fechaInicio}</TableCell>
-                      <TableCell>{user.fechaFinalizacion}</TableCell>
+                      <TableCell>{user.duracion_meses} meses</TableCell>
+                      <TableCell>{user.fecha_inicio}</TableCell>
+                      <TableCell>{user.fecha_finalizacion}</TableCell>
                       <TableCell>{user.direccion}</TableCell>
                       <TableCell>{user.comuna}</TableCell>
                       <TableCell className="text-right">

@@ -43,28 +43,28 @@ export function EmcaliIcon() {
 
 // Lista de comunas
 const comunas = [
-  "Comuna 1",
-  "Comuna 2",
-  "Comuna 3",
-  "Comuna 4",
-  "Comuna 5",
-  "Comuna 6",
-  "Comuna 7",
-  "Comuna 8",
-  "Comuna 9",
-  "Comuna 10",
-  "Comuna 11",
-  "Comuna 12",
-  "Comuna 13",
-  "Comuna 14",
-  "Comuna 15",
-  "Comuna 16",
-  "Comuna 17",
-  "Comuna 18",
-  "Comuna 19",
-  "Comuna 20",
-  "Comuna 21",
-  "Comuna 22",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+  "19",
+  "20",
+  "21",
+  "22",
 ];
 
 export default function RegistroForm() {
@@ -239,7 +239,7 @@ export default function RegistroForm() {
     };
 
     try {
-      const response = await axios.post(`${baseUrl}/auth/registro`, data);
+      const response = await axios.post(`${baseUrl}/usuarios`, data);
       console.log("Registro exitoso:", response.data);
 
       // Mostrar mensaje de éxito

@@ -12,12 +12,18 @@ interface User {
   cedula: string;
   correo: string;
   numeroContrato: string;
-  duracionMeses: string;
-  fechaInicio: string;
-  fechaFinalizacion: string;
-  rol: string;
+  duracion_meses: string;
+  fecha_inicio: string;
+  fecha_finalizacion: string;
+  rol: Rol;
   direccion: string;
   comuna: string;
+}
+
+interface Rol {
+  id:string;
+  nombre:string;
+  descripcion: string;
 }
 
 const DashboardUsuarios: React.FC = () => {
@@ -28,7 +34,7 @@ const DashboardUsuarios: React.FC = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await get<User[]>("/api/usuarios"); // Usamos el método get del hook
+      const response = await get<User[]>("/usuarios"); // Usamos el método get del hook
       if (Array.isArray(response)) {
         setUsers(response);
       } else {

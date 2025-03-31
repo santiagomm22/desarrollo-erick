@@ -47,7 +47,7 @@ export default function SignInCard() {
 
   const validateInputs = () => {
     const correo = document.getElementById("correo") as HTMLInputElement;
-    const password = document.getElementById("password") as HTMLInputElement;
+    const contraseña = document.getElementById("contraseña") as HTMLInputElement; // Cambiamos el ID aquí
 
     let isValid = true;
 
@@ -60,16 +60,16 @@ export default function SignInCard() {
       setEmailErrorMessage("");
     }
 
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage(
-        "La contraseña debe tener al menos 6 caracteres."
-      );
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage("");
-    }
+    // if (!contraseña.value || contraseña.value.length < 6) {
+    //   setPasswordError(true);
+    //   setPasswordErrorMessage(
+    //     "La contraseña debe tener al menos 6 caracteres."
+    //   );
+    //   isValid = false;
+    // } else {
+    //   setPasswordError(false);
+    //   setPasswordErrorMessage("");
+    // }
     return isValid;
   };
 
@@ -82,11 +82,10 @@ export default function SignInCard() {
       return;
     }
 
-    const correo = (document.getElementById("correo") as HTMLInputElement)
-      .value;
+    const correo = (document.getElementById("correo") as HTMLInputElement).value;
     const data = {
       correo,
-      password: (document.getElementById("password") as HTMLInputElement).value,
+      contraseña: (document.getElementById("contraseña") as HTMLInputElement).value, // Cambiamos "password" por "contraseña"
     };
 
     try {
@@ -96,23 +95,25 @@ export default function SignInCard() {
         },
       });
 
-      const { token, user } = response.data;
+      const token = response.data.token;
+      const user = response.data;
+
 
       dispatch(
         loginSuccess({
           token,
-          user,
+          user
         })
       );
 
       localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("rol", user.role);
+      localStorage.setItem("correo", user.correo);
+      localStorage.setItem("rol", user.rol.nombre);
 
       const targetRoute = (() => {
-        switch (user.rol) {
+        switch (user.rol.nombre) {
           case "ADMINISTRADOR":
-            return "/dashboard";
+            return "/usuarios";
           case "USUARIO":
             return "/RgVactor";
           default:
@@ -144,7 +145,7 @@ export default function SignInCard() {
 
     try {
       // Aquí implementarías la lógica para solicitar restablecer contraseña
-      // await axios.post(`${baseUrl}/auth/reset-password`, { email: resetEmail });
+      // await axios.post(${baseUrl}/auth/reset-password, { email: resetEmail });
       Notify.success("Se ha enviado un correo para restablecer su contraseña");
       setResetEmail("");
     } catch (error) {
@@ -159,7 +160,7 @@ export default function SignInCard() {
         backgroundImage: "url('/images/FondoEmcali.png')",
         backgroundSize: "cover",
         backgroundColor: "rgba(0, 0, 0, 0.6)", // Fallback color
-        backgroundBlendMode: "overlay", // Oscurece ligeramente la imagen
+        backgroundBlendMode: "overlay",
       }}
     >
       <Card className="w-full max-w-md shadow-lg">
@@ -185,7 +186,7 @@ export default function SignInCard() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Contraseña</Label>
+                <Label htmlFor="contraseña">Contraseña</Label> {/* Cambiamos el htmlFor */}
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="link" className="p-0 h-auto text-sm">
@@ -221,7 +222,7 @@ export default function SignInCard() {
                 </Dialog>
               </div>
               <Input
-                id="password"
+                id="contraseña" 
                 type="password"
                 placeholder="••••••"
                 className={passwordError ? "border-red-500" : ""}
