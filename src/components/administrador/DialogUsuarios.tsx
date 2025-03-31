@@ -1,5 +1,5 @@
 // src/components/dashboard/DashboardHeader.tsx
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, Eye, EyeOff } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "../ui/button";
@@ -22,17 +22,23 @@ import {
 } from "../ui/Select";
 import { ScrollArea } from "../ui/ScrollArea";
 import { FormEvent, useState } from "react";
-import axios, { AxiosError } from "axios";
 import Notiflix from "notiflix";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
 import { Calendar } from "../ui/Calendar";
-import { cn } from "@/lib/utils"; // Asegúrate de tener esta utilidad importada
+import { cn } from "@/lib/utils";
+import { useApi } from "@/hooks/useApi"; // Hook ya importado
 
-export const DialogUsuarios = () => {
+interface DialogUsuariosProps {
+  fetchUsers: () => void; // 🔹 Especificamos que es una función
+}
+
+export const DialogUsuarios = ({ fetchUsers }: DialogUsuariosProps) => {
   const today = new Date();
   const formattedDate = format(today, "EEEE, dd 'de' MMMM 'de' yyyy", {
     locale: es,
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const { post } = useApi(); // Desestructuramos el método post del hook
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -45,12 +51,18 @@ export const DialogUsuarios = () => {
     rol: "",
     direccion: "",
     comuna: "",
+    password: "",
+    confirmPassword: "",
   });
   const [open, setOpen] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({}); // Estado para errores
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
   const handleSelectChange = (value: string) => {
@@ -59,15 +71,48 @@ export const DialogUsuarios = () => {
 
   const handleDateChange = (name: string, date: Date | undefined) => {
     if (date) {
-      const formattedDate = format(date, "yyyy-MM-dd"); // Formato ISO para el input
+      const formattedDate = format(date, "yyyy-MM-dd");
       setFormData((prev) => ({ ...prev, [name]: formattedDate }));
     }
   };
 
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.password) {
+      newErrors.password = "La contraseña es requerida";
+      isValid = false;
+    } else if (formData.password.length < 8) {
+      newErrors.password = "La contraseña debe tener al menos 8 caracteres";
+      isValid = false;
+    }
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = "Debe confirmar la contraseña";
+      isValid = false;
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Las contraseñas no coinciden";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      Notiflix.Notify.warning("Por favor corrige los errores en el formulario");
+      return;
+    }
+
+    // Filtramos confirmPassword ya que no es necesario enviarlo al backend
+    const { confirmPassword, ...dataToSend } = formData;
+
     try {
-      const response = await axios.post("/api/usuarios", formData);
+      await post("/api/usuarios", dataToSend); // Usamos el método post del hook
       Notiflix.Notify.success("Usuario creado exitosamente");
       setFormData({
         nombre: "",
@@ -80,14 +125,15 @@ export const DialogUsuarios = () => {
         rol: "",
         direccion: "",
         comuna: "",
+        password: "",
+        confirmPassword: "",
       });
+      setErrors({});
       setOpen(false);
+      fetchUsers(); // 🔄 Actualizar la tabla
     } catch (error) {
-      const axiosError = error as AxiosError<{ message?: string }>;
-      Notiflix.Notify.failure(
-        "Error al crear usuario: " +
-          (axiosError.response?.data?.message || axiosError.message)
-      );
+      // El hook ya maneja el error y muestra la notificación con Notiflix
+      console.error("Error al crear usuario:", error); // Opcional: log para depuración
     }
   };
 
@@ -256,9 +302,9 @@ export const DialogUsuarios = () => {
                           <SelectValue placeholder="Seleccione un rol" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="admin">Administrador</SelectItem>
-                          <SelectItem value="user">Usuario</SelectItem>
-                          <SelectItem value="guest">Invitado</SelectItem>
+                          <SelectItem value="admin">ADMINISTRADOR</SelectItem>
+                          <SelectItem value="user">TRABAJADOR</SelectItem>
+                          <SelectItem value="guest">PROVEEDOR</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -281,6 +327,72 @@ export const DialogUsuarios = () => {
                         onChange={handleInputChange}
                         required
                       />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="password">Contraseña</Label>
+                      <div className="relative">
+                        <Input
+                          id="password"
+                          name="password"
+                          type={showPassword ? "text" : "password"}
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          required
+                          className="pr-10"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                      {errors.password && (
+                        <p className="text-sm text-red-500">
+                          {errors.password}
+                        </p>
+                      )}
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="confirmPassword">
+                        Confirmar Contraseña
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="confirmPassword"
+                          name="confirmPassword"
+                          type={showPassword ? "text" : "password"}
+                          value={formData.confirmPassword}
+                          onChange={handleInputChange}
+                          required
+                          className="pr-10"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                      {errors.confirmPassword && (
+                        <p className="text-sm text-red-500">
+                          {errors.confirmPassword}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </ScrollArea>

@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import SignInCard from "@/pages/login/SignInCard";
 import DashboardUsuarios from "@/pages/CrearUsuarios/DashboardUsuarios";
 import RegistroForm from "@/pages/registro/RegistroForm";
+import DashboardArchivos from "@/pages/CargarArchivos/DashboardArchivos";
 import ProtectedRoute from "./ProtectedRoute";
 import MainLayout from "@/components/layouts/MainLayout";
 
@@ -15,23 +16,23 @@ const Routers = () => {
       <Route element={<MainLayout />}>
         <Route path="/usuarios" element={<DashboardUsuarios />} />
 
+        <Route path="/archivos" element={<DashboardArchivos />} />
+
         {/* Rutas protegidas con AuthLayout */}
         {/* <Route element={<MainLayout />}>
         <Route
-          path="/dashboard"
+          path="/usuarios"
           element={
             <ProtectedRoute allowedRoles={["ADMINISTRADOR"]}>
-              <DashboardPage />
+              <DashboardUsuarios />
             </ProtectedRoute>
           }
-        /> */}
-        {/* Agrega más rutas protegidas aquí según necesites */}
-        {/* Ejemplo: Ruta para Empresas */}
-        {/* <Route
-          path="/empresas"
+        />
+        <Route
+          path="/archivos"
           element={
             <ProtectedRoute allowedRoles={["ADMINISTRADOR"]}>
-              <EmpresasPage />
+              <DashboardArchivos />
             </ProtectedRoute>
           }
         /> */}

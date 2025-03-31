@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, EyeIcon, EyeOffIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,7 @@ import {
 import axios from "axios";
 import { Notify } from "notiflix/build/notiflix-notify-aio";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/ScrollArea";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -79,6 +80,8 @@ export default function RegistroForm() {
     fechaFin: "",
     direccion: "",
     comuna: "",
+    password: "",
+    confirmPassword: "",
   });
 
   // Estados para los campos del formulario
@@ -93,6 +96,10 @@ export default function RegistroForm() {
   const [fechaFin, setFechaFin] = React.useState<Date | undefined>(undefined);
   const [direccion, setDireccion] = React.useState("");
   const [comuna, setComuna] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
   // Función para establecer la fecha de finalización automáticamente basada en la fecha de inicio y duración
   React.useEffect(() => {
@@ -117,6 +124,8 @@ export default function RegistroForm() {
       fechaFin: "",
       direccion: "",
       comuna: "",
+      password: "",
+      confirmPassword: "",
     };
 
     let isValid = true;
@@ -184,6 +193,24 @@ export default function RegistroForm() {
       isValid = false;
     }
 
+    // Validar contraseña
+    if (!password) {
+      errors.password = "La contraseña es requerida";
+      isValid = false;
+    } else if (password.length < 8) {
+      errors.password = "La contraseña debe tener al menos 8 caracteres";
+      isValid = false;
+    }
+
+    // Validar confirmación de contraseña
+    if (!confirmPassword) {
+      errors.confirmPassword = "Debe confirmar la contraseña";
+      isValid = false;
+    } else if (password !== confirmPassword) {
+      errors.confirmPassword = "Las contraseñas no coinciden";
+      isValid = false;
+    }
+
     setFormErrors(errors);
     return isValid;
   };
@@ -208,10 +235,10 @@ export default function RegistroForm() {
       fechaFinalizacion: fechaFin?.toISOString(),
       direccion,
       comuna,
+      password,
     };
 
     try {
-      // Modificar ruta a "/auth/registro" en español
       const response = await axios.post(`${baseUrl}/auth/registro`, data);
       console.log("Registro exitoso:", response.data);
 
@@ -220,7 +247,7 @@ export default function RegistroForm() {
 
       // Redireccionar al login
       setTimeout(() => {
-        navigate("/login");
+        navigate("/");
       }, 2000);
     } catch (error: any) {
       console.error("Error al registrar:", error);
@@ -231,6 +258,14 @@ export default function RegistroForm() {
       Notify.failure(errorMessage);
       setIsSubmitting(false);
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   return (
@@ -405,6 +440,76 @@ export default function RegistroForm() {
                 )}
               </div>
 
+              {/* Contraseña */}
+              <div className="space-y-2">
+                <Label htmlFor="password">Contraseña</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Ingrese su contraseña"
+                    className={
+                      formErrors.password ? "border-red-500 pr-10" : "pr-10"
+                    }
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2"
+                    onClick={togglePasswordVisibility}
+                  >
+                    {showPassword ? (
+                      <EyeOffIcon className="h-4 w-4" />
+                    ) : (
+                      <EyeIcon className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                {formErrors.password && (
+                  <p className="text-sm text-red-500">{formErrors.password}</p>
+                )}
+              </div>
+
+              {/* Confirmar Contraseña */}
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirme su contraseña"
+                    className={
+                      formErrors.confirmPassword
+                        ? "border-red-500 pr-10"
+                        : "pr-10"
+                    }
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2"
+                    onClick={toggleConfirmPasswordVisibility}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOffIcon className="h-4 w-4" />
+                    ) : (
+                      <EyeIcon className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                {formErrors.confirmPassword && (
+                  <p className="text-sm text-red-500">
+                    {formErrors.confirmPassword}
+                  </p>
+                )}
+              </div>
+
               {/* Dirección de residencia */}
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="direccion">Dirección de Residencia</Label>
@@ -430,11 +535,13 @@ export default function RegistroForm() {
                     <SelectValue placeholder="Seleccione su comuna" />
                   </SelectTrigger>
                   <SelectContent>
-                    {comunas.map((com) => (
-                      <SelectItem key={com} value={com}>
-                        {com}
-                      </SelectItem>
-                    ))}
+                    <ScrollArea className="h-[60vh] pr-4">
+                      {comunas.map((com) => (
+                        <SelectItem key={com} value={com}>
+                          {com}
+                        </SelectItem>
+                      ))}
+                    </ScrollArea>
                   </SelectContent>
                 </Select>
                 {formErrors.comuna && (
