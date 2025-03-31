@@ -47,7 +47,9 @@ export default function SignInCard() {
 
   const validateInputs = () => {
     const correo = document.getElementById("correo") as HTMLInputElement;
-    const password = document.getElementById("password") as HTMLInputElement;
+    const contraseña = document.getElementById(
+      "contraseña"
+    ) as HTMLInputElement; // Cambiamos el ID aquí
 
     let isValid = true;
 
@@ -60,7 +62,7 @@ export default function SignInCard() {
       setEmailErrorMessage("");
     }
 
-    if (!password.value || password.value.length < 6) {
+    if (!contraseña.value || contraseña.value.length < 6) {
       setPasswordError(true);
       setPasswordErrorMessage(
         "La contraseña debe tener al menos 6 caracteres."
@@ -86,7 +88,8 @@ export default function SignInCard() {
       .value;
     const data = {
       correo,
-      password: (document.getElementById("password") as HTMLInputElement).value,
+      contraseña: (document.getElementById("contraseña") as HTMLInputElement)
+        .value, // Cambiamos "password" por "contraseña"
     };
 
     try {
@@ -159,7 +162,7 @@ export default function SignInCard() {
         backgroundImage: "url('/images/FondoEmcali.png')",
         backgroundSize: "cover",
         backgroundColor: "rgba(0, 0, 0, 0.6)", // Fallback color
-        backgroundBlendMode: "overlay", // Oscurece ligeramente la imagen
+        backgroundBlendMode: "overlay",
       }}
     >
       <Card className="w-full max-w-md shadow-lg">
@@ -185,7 +188,8 @@ export default function SignInCard() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Contraseña</Label>
+                <Label htmlFor="contraseña">Contraseña</Label>{" "}
+                {/* Cambiamos el htmlFor */}
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="link" className="p-0 h-auto text-sm">
@@ -221,7 +225,7 @@ export default function SignInCard() {
                 </Dialog>
               </div>
               <Input
-                id="password"
+                id="contraseña"
                 type="password"
                 placeholder="••••••"
                 className={passwordError ? "border-red-500" : ""}
